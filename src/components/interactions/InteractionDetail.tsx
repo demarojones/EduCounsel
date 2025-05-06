@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Calendar, Clock, User, Users, Pencil, Trash2, ArrowLeft, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
+import { ArrowLeft, Pencil, Trash2, Clock, Users, AlertCircle, UserPlus } from 'lucide-react';
 import { useAppContext } from '../../contexts/AppContext';
 
 const InteractionDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { interactions, interactionReasons, deleteInteraction, getReasonById } = useAppContext();
+  const location = useLocation();
+  const { interactions, deleteInteraction } = useAppContext();
   
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
+  const searchParams = new URLSearchParams(location.search);
+  const fromCalendar = searchParams.get('from') === 'calendar';
   
   const interaction = interactions.find(i => i.id === id);
   
@@ -17,11 +21,11 @@ const InteractionDetail: React.FC = () => {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
         <p className="text-xl text-gray-700">Interaction not found.</p>
         <Link 
-          to="/interactions" 
+          to={fromCalendar ? '/calendar' : '/interactions'}
           className="mt-4 inline-flex items-center text-blue-600 hover:text-blue-800"
         >
           <ArrowLeft size={16} className="mr-1" />
-          Back to Interactions
+          Back to {fromCalendar ? 'Calendar' : 'Interactions'}
         </Link>
       </div>
     );
@@ -29,7 +33,7 @@ const InteractionDetail: React.FC = () => {
   
   const handleDelete = () => {
     deleteInteraction(interaction.id);
-    navigate('/interactions');
+    navigate(fromCalendar ? '/calendar' : '/interactions');
   };
   
   // Format time
@@ -56,11 +60,11 @@ const InteractionDetail: React.FC = () => {
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div className="mb-6">
         <Link 
-          to="/interactions" 
+          to={fromCalendar ? '/calendar' : '/interactions'}
           className="inline-flex items-center text-blue-600 hover:text-blue-800"
         >
           <ArrowLeft size={16} className="mr-1" />
-          Back to Interactions
+          Back to {fromCalendar ? 'Calendar' : 'Interactions'}
         </Link>
       </div>
       
@@ -69,7 +73,7 @@ const InteractionDetail: React.FC = () => {
           <h2 className="text-xl font-semibold text-gray-800">Interaction Details</h2>
           <div className="flex space-x-2">
             <Link
-              to={`/interactions/edit/${interaction.id}`}
+              to={`/interactions/edit/${interaction.id}${fromCalendar ? '?from=calendar' : ''}`}
               className="p-2 text-blue-600 hover:text-blue-800 rounded-full hover:bg-blue-50"
               title="Edit"
             >
@@ -96,7 +100,7 @@ const InteractionDetail: React.FC = () => {
                     ? 'bg-green-100 text-green-600' 
                     : 'bg-blue-100 text-blue-600'
                 }`}>
-                  {interaction.type === 'Student' ? <Users size={16} /> : <User size={16} />}
+                  {interaction.type === 'Student' ? <Users size={16} /> : <Users size={16} />}
                 </div>
                 <div className="ml-3">
                   <p className="text-lg font-medium text-gray-800">{interaction.personName}</p>
@@ -109,7 +113,7 @@ const InteractionDetail: React.FC = () => {
               <h3 className="text-sm font-medium text-gray-500 mb-1">Date & Time</h3>
               <div className="space-y-1">
                 <div className="flex items-center">
-                  <Calendar size={16} className="text-gray-400 mr-2" />
+                  <Clock size={16} className="text-gray-400 mr-2" />
                   <p className="text-base text-gray-700">{formatDate(interaction.date)}</p>
                 </div>
                 <div className="flex items-center">
@@ -119,24 +123,6 @@ const InteractionDetail: React.FC = () => {
                   </p>
                 </div>
               </div>
-            </div>
-          </div>
-          
-          {/* Reasons */}
-          <div className="mb-8">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">Reasons for Interaction</h3>
-            <div className="flex flex-wrap gap-2">
-              {interaction.reasonIds.map(reasonId => {
-                const reason = getReasonById(reasonId);
-                return reason ? (
-                  <span 
-                    key={reasonId}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
-                  >
-                    {reason.category}: {reason.subcategory}
-                  </span>
-                ) : null;
-              })}
             </div>
           </div>
           
@@ -165,7 +151,7 @@ const InteractionDetail: React.FC = () => {
             ) : (
               <div className="flex items-start">
                 <div className="flex-shrink-0 mt-0.5">
-                  <CheckCircle size={16} className="text-green-500" />
+                  <AlertCircle size={16} className="text-green-500" />
                 </div>
                 <div className="ml-3">
                   <p className="text-base text-gray-700">No follow-up required</p>

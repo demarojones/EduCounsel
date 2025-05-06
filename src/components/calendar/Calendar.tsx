@@ -26,7 +26,7 @@ const Calendar: React.FC = () => {
   }));
 
   const handleEventClick = (info: any) => {
-    navigate(`/interactions/${info.event.id}`);
+    navigate(`/interactions/${info.event.id}?from=calendar`);
   };
 
   const handleDateSelect = (selectInfo: any) => {
@@ -34,7 +34,7 @@ const Calendar: React.FC = () => {
     const endTime = selectInfo.endStr.split('T')[1]?.substring(0, 5) || '09:30';
     const date = selectInfo.startStr.split('T')[0];
 
-    navigate(`/interactions/new?date=${date}&startTime=${startTime}&endTime=${endTime}`);
+    navigate(`/interactions/new?date=${date}&startTime=${startTime}&endTime=${endTime}&from=calendar`);
   };
 
   return (
