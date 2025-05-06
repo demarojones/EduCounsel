@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useAppContext } from '../../contexts/AppContext';
 import { Contact } from '../../types';
 
 interface ContactFormProps {
-  contact?: Contact;
   isEditing?: boolean;
 }
 
-const ContactForm: React.FC<ContactFormProps> = ({ contact, isEditing = false }) => {
+const ContactForm: React.FC<ContactFormProps> = ({ isEditing = false }) => {
   const navigate = useNavigate();
-  const { addContact, updateContact } = useAppContext();
+  const { id } = useParams<{ id: string }>();
+  const { addContact, updateContact, contacts } = useAppContext();
   
   const [formData, setFormData] = useState({
     type: 'Parent' as Contact['type'],
@@ -27,18 +27,21 @@ const ContactForm: React.FC<ContactFormProps> = ({ contact, isEditing = false })
   
   // Load contact data if editing
   useEffect(() => {
-    if (contact && isEditing) {
-      setFormData({
-        type: contact.type,
-        firstName: contact.firstName,
-        lastName: contact.lastName,
-        relation: contact.relation || '',
-        phone: contact.phone || '',
-        email: contact.email || '',
-        notes: contact.notes || ''
-      });
+    if (isEditing && id) {
+      const contact = contacts.find(c => c.id === id);
+      if (contact) {
+        setFormData({
+          type: contact.type,
+          firstName: contact.firstName,
+          lastName: contact.lastName,
+          relation: contact.relation || '',
+          phone: contact.phone || '',
+          email: contact.email || '',
+          notes: contact.notes || ''
+        });
+      }
     }
-  }, [contact, isEditing]);
+  }, [isEditing, id, contacts]);
   
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -73,9 +76,9 @@ const ContactForm: React.FC<ContactFormProps> = ({ contact, isEditing = false })
     
     if (!validate()) return;
     
-    if (isEditing && contact) {
+    if (isEditing && id) {
       updateContact({
-        ...contact,
+        id,
         ...formData
       });
     } else {

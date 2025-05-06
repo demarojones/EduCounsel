@@ -1,33 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { CalendarClock, Clock, Info } from 'lucide-react';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { CalendarClock, Clock, Info, ArrowLeft } from 'lucide-react';
 import { useAppContext } from '../../contexts/AppContext';
 import { InteractionType, Interaction } from '../../types';
 
 interface InteractionFormProps {
-  interaction?: Interaction;
   isEditing?: boolean;
 }
 
-const InteractionForm: React.FC<InteractionFormProps> = ({ interaction, isEditing = false }) => {
+const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { id } = useParams<{ id: string }>();
   const { 
     students, 
     contacts, 
     interactionReasons, 
     addInteraction, 
     updateInteraction,
-    calculateInteractionDuration 
+    calculateInteractionDuration,
+    interactions
   } = useAppContext();
 
   const today = new Date().toISOString().split('T')[0];
+  const searchParams = new URLSearchParams(location.search);
+  const fromCalendar = searchParams.get('from') === 'calendar';
 
   const [formData, setFormData] = useState({
-    date: today,
-    startTime: '08:00',
-    endTime: '08:30',
-    type: 'Student' as InteractionType,
-    personId: '',
+    date: searchParams.get('date') || today,
+    startTime: searchParams.get('startTime') || '08:00',
+    endTime: searchParams.get('endTime') || '08:30',
+    type: (searchParams.get('type') as InteractionType) || 'Student',
+    personId: searchParams.get('personId') || '',
     reasonIds: [] as string[],
     notes: '',
     followUpNeeded: false,
@@ -39,21 +43,23 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ interaction, isEditin
 
   // Load interaction data if editing
   useEffect(() => {
-    if (interaction && isEditing) {
-      setFormData({
-        date: interaction.date,
-        startTime: interaction.startTime,
-        endTime: interaction.endTime,
-        type: interaction.type,
-        personId: interaction.personId,
-        reasonIds: interaction.reasonIds,
-        notes: interaction.notes,
-        followUpNeeded: interaction.followUpNeeded,
-        followUpDate: interaction.followUpDate || ''
-      });
-      setDuration(interaction.duration);
+    if (isEditing && id) {
+      const interaction = interactions.find(i => i.id === id);
+      if (interaction) {
+        setFormData({
+          date: interaction.date,
+          startTime: interaction.startTime,
+          endTime: interaction.endTime,
+          type: interaction.type,
+          personId: interaction.personId,
+          reasonIds: interaction.reasonIds,
+          notes: interaction.notes,
+          followUpNeeded: interaction.followUpNeeded,
+          followUpDate: interaction.followUpDate || ''
+        });
+      }
     }
-  }, [interaction, isEditing]);
+  }, [isEditing, id, interactions]);
 
   // Update duration when times change
   useEffect(() => {
@@ -137,9 +143,9 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ interaction, isEditin
       return;
     }
     
-    if (isEditing && interaction) {
+    if (isEditing && id) {
       updateInteraction({
-        ...interaction,
+        id,
         ...formData,
         personName,
         duration
@@ -152,7 +158,8 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ interaction, isEditin
       });
     }
     
-    navigate('/interactions');
+    // Navigate back to calendar if we came from there
+    navigate(fromCalendar ? '/calendar' : '/interactions');
   };
 
   // Group reasons by category
@@ -166,6 +173,16 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ interaction, isEditin
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="mb-6">
+        <button 
+          onClick={() => navigate(fromCalendar ? '/calendar' : '/interactions')} 
+          className="inline-flex items-center text-blue-600 hover:text-blue-800"
+        >
+          <ArrowLeft size={16} className="mr-1" />
+          Back to {fromCalendar ? 'Calendar' : 'Interactions'}
+        </button>
+      </div>
+      
       <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
         <div className="px-6 py-5 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800">
@@ -354,7 +371,7 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ interaction, isEditin
               rows={4}
               value={formData.notes}
               onChange={handleChange}
-              className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               placeholder="Enter details about the interaction..."
             ></textarea>
           </div>
@@ -407,7 +424,7 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ interaction, isEditin
           <div className="flex justify-end space-x-3">
             <button
               type="button"
-              onClick={() => navigate('/interactions')}
+              onClick={() => navigate(fromCalendar ? '/calendar' : '/interactions')}
               className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Cancel

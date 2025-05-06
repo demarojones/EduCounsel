@@ -12,7 +12,7 @@ const navItems: NavItem[] = [
   { name: 'Dashboard', path: '/admin' },
   { name: 'Users', path: '/admin/users' },
   { name: 'Reasons', path: '/admin/reasons' },
-  { name: 'Reports', path: '/reports' },
+  { name: 'Reports', path: '/reports' }
 ];
 
 const AdminHeader: React.FC = () => {
@@ -35,7 +35,7 @@ const AdminHeader: React.FC = () => {
   };
 
   return (
-    <header
+    <header 
       className={`fixed top-0 w-full z-10 transition-all duration-300 ${
         scrolled ? 'bg-white shadow-md' : 'bg-white bg-opacity-95'
       }`}
@@ -50,7 +50,7 @@ const AdminHeader: React.FC = () => {
               <h1 className="text-xl font-bold text-gray-800">Admin Portal</h1>
             </Link>
           </div>
-
+          
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => (
@@ -67,7 +67,7 @@ const AdminHeader: React.FC = () => {
               </Link>
             ))}
           </nav>
-
+          
           {/* User Profile and Notifications */}
           <div className="hidden md:flex items-center">
             <button className="relative p-2 text-gray-600 hover:text-gray-800 rounded-full hover:bg-gray-100 mr-2">
@@ -77,8 +77,7 @@ const AdminHeader: React.FC = () => {
             <div className="flex items-center">
               <div className="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center mr-2">
                 <span className="font-medium text-sm">
-                  {profile?.first_name?.[0]}
-                  {profile?.last_name?.[0]}
+                  {profile?.first_name?.[0]}{profile?.last_name?.[0]}
                 </span>
               </div>
               <div className="hidden md:block text-sm">
@@ -90,7 +89,7 @@ const AdminHeader: React.FC = () => {
               <ChevronDown size={16} className="ml-1 text-gray-500" />
             </div>
           </div>
-
+          
           {/* Mobile Menu Button */}
           <button
             className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-800 hover:bg-gray-100"
@@ -100,7 +99,7 @@ const AdminHeader: React.FC = () => {
           </button>
         </div>
       </div>
-
+      
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-t py-2">
@@ -122,8 +121,7 @@ const AdminHeader: React.FC = () => {
             <div className="flex items-center">
               <div className="w-10 h-10 rounded-full bg-purple-500 text-white flex items-center justify-center mr-3">
                 <span className="font-medium">
-                  {profile?.first_name?.[0]}
-                  {profile?.last_name?.[0]}
+                  {profile?.first_name?.[0]}{profile?.last_name?.[0]}
                 </span>
               </div>
               <div>
@@ -141,4 +139,3 @@ const AdminHeader: React.FC = () => {
 };
 
 export default AdminHeader;
-// This code defines a responsive header component for an admin portal using React and Tailwind CSS.

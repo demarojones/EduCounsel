@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ChevronDown, Bell } from 'lucide-react';
+import { Menu, X, ChevronDown, Bell, Calendar } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 interface NavItem {
@@ -9,6 +9,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { name: 'Dashboard', path: '/' },
+  { name: 'Calendar', path: '/calendar' },
   { name: 'Students', path: '/students' },
   { name: 'Contacts', path: '/contacts' },
   { name: 'Interactions', path: '/interactions' },

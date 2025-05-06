@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useAppContext } from '../../contexts/AppContext';
 import { Student } from '../../types';
 
 interface StudentFormProps {
-  student?: Student;
   isEditing?: boolean;
 }
 
-const StudentForm: React.FC<StudentFormProps> = ({ student, isEditing = false }) => {
+const StudentForm: React.FC<StudentFormProps> = ({ isEditing = false }) => {
   const navigate = useNavigate();
-  const { addStudent, updateStudent } = useAppContext();
+  const { id } = useParams<{ id: string }>();
+  const { addStudent, updateStudent, students } = useAppContext();
   
   const [formData, setFormData] = useState({
     firstName: '',
@@ -24,15 +24,18 @@ const StudentForm: React.FC<StudentFormProps> = ({ student, isEditing = false })
   
   // Load student data if editing
   useEffect(() => {
-    if (student && isEditing) {
-      setFormData({
-        firstName: student.firstName,
-        lastName: student.lastName,
-        grade: student.grade,
-        notes: student.notes
-      });
+    if (isEditing && id) {
+      const student = students.find(s => s.id === id);
+      if (student) {
+        setFormData({
+          firstName: student.firstName,
+          lastName: student.lastName,
+          grade: student.grade,
+          notes: student.notes || ''
+        });
+      }
     }
-  }, [student, isEditing]);
+  }, [isEditing, id, students]);
   
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -62,9 +65,9 @@ const StudentForm: React.FC<StudentFormProps> = ({ student, isEditing = false })
     
     if (!validate()) return;
     
-    if (isEditing && student) {
+    if (isEditing && id) {
       updateStudent({
-        ...student,
+        id,
         ...formData
       });
     } else {

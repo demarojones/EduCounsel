@@ -24,6 +24,7 @@ import ContactForm from './components/contacts/ContactForm';
 import InteractionList from './components/interactions/InteractionList';
 import InteractionDetail from './components/interactions/InteractionDetail';
 import InteractionForm from './components/interactions/InteractionForm';
+import Calendar from './components/calendar/Calendar';
 import Reports from './components/reports/Reports';
 
 function App() {
@@ -33,7 +34,7 @@ function App() {
         <AppProvider>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
-
+            
             {/* Admin Routes */}
             <Route
               path="/admin"
@@ -48,7 +49,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            
             <Route
               path="/admin/users"
               element={
@@ -62,7 +63,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            
             <Route
               path="/admin/reasons"
               element={
@@ -76,7 +77,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            
             {/* Counselor Routes */}
             <Route
               path="/"
@@ -91,7 +92,21 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            
+            <Route
+              path="/calendar"
+              element={
+                <ProtectedRoute requireCounselor>
+                  <div className="min-h-screen bg-gray-50">
+                    <Header />
+                    <div className="pt-20 pb-10">
+                      <Calendar />
+                    </div>
+                  </div>
+                </ProtectedRoute>
+              }
+            />
+            
             <Route
               path="/students"
               element={
@@ -105,7 +120,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            
             <Route
               path="/students/:id"
               element={
@@ -119,7 +134,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            
             <Route
               path="/students/new"
               element={
@@ -133,7 +148,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            
             <Route
               path="/students/edit/:id"
               element={
@@ -147,7 +162,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            
             <Route
               path="/contacts"
               element={
@@ -161,7 +176,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            
             <Route
               path="/contacts/:id"
               element={
@@ -175,7 +190,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            
             <Route
               path="/contacts/new"
               element={
@@ -189,7 +204,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            
             <Route
               path="/contacts/edit/:id"
               element={
@@ -203,7 +218,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            
             <Route
               path="/interactions"
               element={
@@ -217,7 +232,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            
             <Route
               path="/interactions/:id"
               element={
@@ -231,7 +246,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            
             <Route
               path="/interactions/new"
               element={
@@ -245,7 +260,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            
             <Route
               path="/interactions/edit/:id"
               element={
@@ -259,16 +274,16 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            
             {/* Reports Route - Available to both roles */}
             <Route
               path="/reports"
               element={
                 <ProtectedRoute>
                   <div className="min-h-screen bg-gray-50">
-                    {(props: { isAdmin: boolean }) => (
+                    {({ isAdmin }) => (
                       <>
-                        {props.isAdmin ? <AdminHeader /> : <Header />}
+                        {isAdmin ? <AdminHeader /> : <Header />}
                         <div className="pt-20 pb-10">
                           <Reports />
                         </div>
@@ -284,7 +299,9 @@ function App() {
               path="*"
               element={
                 <ProtectedRoute>
-                  {({ isAdmin }) => <Navigate to={isAdmin ? '/admin' : '/'} replace />}
+                  {({ isAdmin }) => (
+                    <Navigate to={isAdmin ? "/admin" : "/"} replace />
+                  )}
                 </ProtectedRoute>
               }
             />
@@ -296,4 +313,3 @@ function App() {
 }
 
 export default App;
-// Note: The above code assumes that the components and contexts are correctly implemented and imported.
