@@ -1,17 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-
-interface User {
-  id: string;
-  email: string;
-}
-
-interface Profile {
-  id: string;
-  role: 'counselor' | 'admin';
-  first_name: string;
-  last_name: string;
-}
-
+import { User, Profile } from '../types';
 interface AuthContextType {
   user: User | null;
   profile: Profile | null;
@@ -27,14 +15,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Mock user data
 const mockUser: User = {
   id: '1',
-  email: 'e.jones@example.com'
+  email: 'e.jones@example.com',
 };
 
 const mockProfile: Profile = {
   id: '1',
   role: 'counselor',
   first_name: 'Eleanor',
-  last_name: 'Jones'
+  last_name: 'Jones',
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -52,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: '2',
           role: 'admin',
           first_name: 'Admin',
-          last_name: 'User'
+          last_name: 'User',
         });
       } else if (email === 'counselor@example.com' && password === 'counselor') {
         setUser(mockUser);
@@ -61,7 +49,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Invalid credentials');
       }
     } catch (error) {
-      throw error;
+      console.log(error);
+      throw new Error('Authentication failed');
     } finally {
       setIsLoading(false);
     }
@@ -79,14 +68,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signIn,
     signOut,
     isAdmin: profile?.role === 'admin',
-    isCounselor: profile?.role === 'counselor'
+    isCounselor: profile?.role === 'counselor',
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {

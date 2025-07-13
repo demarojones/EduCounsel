@@ -34,7 +34,7 @@ function App() {
         <AppProvider>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
-            
+
             {/* Admin Routes */}
             <Route
               path="/admin"
@@ -49,7 +49,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path="/admin/users"
               element={
@@ -63,7 +63,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path="/admin/reasons"
               element={
@@ -77,7 +77,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             {/* Counselor Routes */}
             <Route
               path="/"
@@ -92,7 +92,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path="/calendar"
               element={
@@ -106,7 +106,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path="/students"
               element={
@@ -120,7 +120,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path="/students/:id"
               element={
@@ -134,7 +134,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path="/students/new"
               element={
@@ -148,7 +148,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path="/students/edit/:id"
               element={
@@ -162,7 +162,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path="/contacts"
               element={
@@ -176,7 +176,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path="/contacts/:id"
               element={
@@ -190,7 +190,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path="/contacts/new"
               element={
@@ -204,7 +204,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path="/contacts/edit/:id"
               element={
@@ -218,7 +218,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path="/interactions"
               element={
@@ -232,7 +232,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path="/interactions/:id"
               element={
@@ -246,7 +246,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path="/interactions/new"
               element={
@@ -260,7 +260,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             <Route
               path="/interactions/edit/:id"
               element={
@@ -274,21 +274,17 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             {/* Reports Route - Available to both roles */}
             <Route
               path="/reports"
               element={
                 <ProtectedRoute>
                   <div className="min-h-screen bg-gray-50">
-                    {({ isAdmin }) => (
-                      <>
-                        {isAdmin ? <AdminHeader /> : <Header />}
-                        <div className="pt-20 pb-10">
-                          <Reports />
-                        </div>
-                      </>
-                    )}
+                    <Header />
+                    <div className="pt-20 pb-10">
+                      <Reports />
+                    </div>
                   </div>
                 </ProtectedRoute>
               }
@@ -299,9 +295,7 @@ function App() {
               path="*"
               element={
                 <ProtectedRoute>
-                  {({ isAdmin }) => (
-                    <Navigate to={isAdmin ? "/admin" : "/"} replace />
-                  )}
+                  {({ isAdmin }) => <Navigate to={isAdmin ? '/admin' : '/'} replace />}
                 </ProtectedRoute>
               }
             />

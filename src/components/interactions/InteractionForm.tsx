@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { CalendarClock, Clock, Info, ArrowLeft } from 'lucide-react';
+import { CalendarClock, Clock, ArrowLeft } from 'lucide-react';
 import { useAppContext } from '../../contexts/AppContext';
-import { InteractionType, Interaction } from '../../types';
+import { InteractionType } from '../../types';
 
 interface InteractionFormProps {
   isEditing?: boolean;
@@ -12,14 +12,14 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams<{ id: string }>();
-  const { 
-    students, 
-    contacts, 
-    interactionReasons, 
-    addInteraction, 
+  const {
+    students,
+    contacts,
+    interactionReasons,
+    addInteraction,
     updateInteraction,
     calculateInteractionDuration,
-    interactions
+    interactions,
   } = useAppContext();
 
   const today = new Date().toISOString().split('T')[0];
@@ -35,7 +35,7 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
     reasonIds: [] as string[],
     notes: '',
     followUpNeeded: false,
-    followUpDate: ''
+    followUpDate: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -44,7 +44,7 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
   // Load interaction data if editing
   useEffect(() => {
     if (isEditing && id) {
-      const interaction = interactions.find(i => i.id === id);
+      const interaction = interactions.find((i) => i.id === id);
       if (interaction) {
         setFormData({
           date: interaction.date,
@@ -55,7 +55,7 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
           reasonIds: interaction.reasonIds,
           notes: interaction.notes,
           followUpNeeded: interaction.followUpNeeded,
-          followUpDate: interaction.followUpDate || ''
+          followUpDate: interaction.followUpDate || '',
         });
       }
     }
@@ -81,7 +81,7 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
     } else {
       setFormData({ ...formData, [name]: value });
     }
-    
+
     // Clear validation error when field is changed
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
@@ -90,16 +90,16 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
 
   const handleReasonChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
-    
+
     if (checked) {
       setFormData({ ...formData, reasonIds: [...formData.reasonIds, value] });
     } else {
       setFormData({
         ...formData,
-        reasonIds: formData.reasonIds.filter(id => id !== value)
+        reasonIds: formData.reasonIds.filter((id) => id !== value),
       });
     }
-    
+
     // Clear validation error when reasons are selected
     if (errors.reasonIds) {
       setErrors({ ...errors, reasonIds: '' });
@@ -108,7 +108,7 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.date) newErrors.date = 'Date is required';
     if (!formData.startTime) newErrors.startTime = 'Start time is required';
     if (!formData.endTime) newErrors.endTime = 'End time is required';
@@ -118,46 +118,46 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
     if (formData.followUpNeeded && !formData.followUpDate) {
       newErrors.followUpDate = 'Follow-up date is required';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validate()) return;
-    
+
     // Get person name based on type and ID
     let personName = '';
     if (formData.type === 'Student') {
-      const student = students.find(s => s.id === formData.personId);
+      const student = students.find((s) => s.id === formData.personId);
       personName = student ? `${student.firstName} ${student.lastName}` : '';
     } else {
-      const contact = contacts.find(c => c.id === formData.personId);
+      const contact = contacts.find((c) => c.id === formData.personId);
       personName = contact ? `${contact.firstName} ${contact.lastName}` : '';
     }
-    
+
     if (!personName) {
       setErrors({ personId: 'Invalid person selected' });
       return;
     }
-    
+
     if (isEditing && id) {
       updateInteraction({
         id,
         ...formData,
         personName,
-        duration
+        duration,
       });
     } else {
       addInteraction({
         ...formData,
         personName,
-        duration
+        duration,
       });
     }
-    
+
     // Navigate back to calendar if we came from there
     navigate(fromCalendar ? '/calendar' : '/interactions');
   };
@@ -168,7 +168,7 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
 
   // Group reasons by category
   const reasonsByCategory: Record<string, typeof interactionReasons> = {};
-  interactionReasons.forEach(reason => {
+  interactionReasons.forEach((reason) => {
     if (!reasonsByCategory[reason.category]) {
       reasonsByCategory[reason.category] = [];
     }
@@ -178,7 +178,7 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div className="mb-6">
-        <button 
+        <button
           onClick={handleCancel}
           className="inline-flex items-center text-blue-600 hover:text-blue-800"
         >
@@ -186,14 +186,14 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
           Back to {fromCalendar ? 'Calendar' : 'Interactions'}
         </button>
       </div>
-      
+
       <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
         <div className="px-6 py-5 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800">
             {isEditing ? 'Edit Interaction' : 'Log New Interaction'}
           </h2>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="p-6">
           {/* Date and Time */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -219,7 +219,7 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
               </div>
               {errors.date && <p className="mt-1 text-sm text-red-600">{errors.date}</p>}
             </div>
-            
+
             <div>
               <label htmlFor="startTime" className="block text-sm font-medium text-gray-700 mb-1">
                 Start Time
@@ -241,7 +241,7 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
               </div>
               {errors.startTime && <p className="mt-1 text-sm text-red-600">{errors.startTime}</p>}
             </div>
-            
+
             <div>
               <label htmlFor="endTime" className="block text-sm font-medium text-gray-700 mb-1">
                 End Time
@@ -267,7 +267,7 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
               )}
             </div>
           </div>
-          
+
           {/* Person Selection */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-1">
@@ -275,7 +275,7 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
                 Interaction With
               </label>
             </div>
-            
+
             <div className="flex space-x-4 mb-2">
               <label className="inline-flex items-center">
                 <input
@@ -288,7 +288,7 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
                 />
                 <span className="ml-2 text-sm text-gray-700">Student</span>
               </label>
-              
+
               <label className="inline-flex items-center">
                 <input
                   type="radio"
@@ -301,7 +301,7 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
                 <span className="ml-2 text-sm text-gray-700">Contact</span>
               </label>
             </div>
-            
+
             <select
               id="personId"
               name="personId"
@@ -312,40 +312,37 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
               } focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md`}
             >
               <option value="">Select {formData.type}</option>
-              
-              {formData.type === 'Student' 
-                ? students.map(student => (
+
+              {formData.type === 'Student'
+                ? students.map((student) => (
                     <option key={student.id} value={student.id}>
                       {student.firstName} {student.lastName} (Grade {student.grade})
                     </option>
                   ))
-                : contacts.map(contact => (
+                : contacts.map((contact) => (
                     <option key={contact.id} value={contact.id}>
                       {contact.firstName} {contact.lastName} ({contact.type})
                     </option>
-                  ))
-              }
+                  ))}
             </select>
             {errors.personId && <p className="mt-1 text-sm text-red-600">{errors.personId}</p>}
           </div>
-          
+
           {/* Reasons */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-1">
               <label className="block text-sm font-medium text-gray-700">
                 Reasons for Interaction
               </label>
-              {errors.reasonIds && (
-                <p className="text-sm text-red-600">{errors.reasonIds}</p>
-              )}
+              {errors.reasonIds && <p className="text-sm text-red-600">{errors.reasonIds}</p>}
             </div>
-            
+
             <div className="border border-gray-300 rounded-md p-3 max-h-60 overflow-y-auto bg-gray-50">
               {Object.entries(reasonsByCategory).map(([category, reasons]) => (
                 <div key={category} className="mb-4">
                   <h4 className="text-sm font-medium text-gray-700 mb-2">{category}</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {reasons.map(reason => (
+                    {reasons.map((reason) => (
                       <label key={reason.id} className="inline-flex items-center">
                         <input
                           type="checkbox"
@@ -363,7 +360,7 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
               ))}
             </div>
           </div>
-          
+
           {/* Notes */}
           <div className="mb-6">
             <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
@@ -379,7 +376,7 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
               placeholder="Enter details about the interaction..."
             ></textarea>
           </div>
-          
+
           {/* Follow-up */}
           <div className="mb-6">
             <div className="flex items-center mb-2">
@@ -395,10 +392,13 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
                 Follow-up Required
               </label>
             </div>
-            
+
             {formData.followUpNeeded && (
               <div className="ml-6">
-                <label htmlFor="followUpDate" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="followUpDate"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Follow-up Date
                 </label>
                 <div className="relative">
@@ -423,7 +423,7 @@ const InteractionForm: React.FC<InteractionFormProps> = ({ isEditing = false }) 
               </div>
             )}
           </div>
-          
+
           {/* Form Actions */}
           <div className="flex justify-end space-x-3">
             <button

@@ -17,6 +17,7 @@ const navItems: NavItem[] = [
 ];
 
 const Header: React.FC = () => {
+  // const { pathname } = useContext(AuthContext);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -35,7 +36,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header 
+    <header
       className={`fixed top-0 w-full z-10 transition-all duration-300 ${
         scrolled ? 'bg-white shadow-md' : 'bg-white bg-opacity-95'
       }`}
@@ -50,7 +51,7 @@ const Header: React.FC = () => {
               <h1 className="text-xl font-bold text-gray-800">EduCounsel</h1>
             </Link>
           </div>
-          
+
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => (
@@ -67,7 +68,7 @@ const Header: React.FC = () => {
               </Link>
             ))}
           </nav>
-          
+
           {/* User Profile and Notifications */}
           <div className="hidden md:flex items-center">
             <button className="relative p-2 text-gray-600 hover:text-gray-800 rounded-full hover:bg-gray-100 mr-2">
@@ -79,13 +80,13 @@ const Header: React.FC = () => {
                 <span className="font-medium text-sm">JD</span>
               </div>
               <div className="hidden md:block text-sm">
-                <p className="font-medium text-gray-800">John Doe</p>
+                <p className="font-medium text-gray-800">name</p>
                 <p className="text-gray-500 text-xs">School Counselor</p>
               </div>
               <ChevronDown size={16} className="ml-1 text-gray-500" />
             </div>
           </div>
-          
+
           {/* Mobile Menu Button */}
           <button
             className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-800 hover:bg-gray-100"
@@ -95,7 +96,7 @@ const Header: React.FC = () => {
           </button>
         </div>
       </div>
-      
+
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-t py-2">

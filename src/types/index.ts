@@ -47,3 +47,15 @@ export interface CounselorStats {
   contactInteractions: number;
   followUpsNeeded: number;
 }
+
+export interface User {
+  id: string;
+  email: string;
+}
+
+export interface Profile {
+  id: string;
+  role: 'counselor' | 'admin';
+  first_name: string;
+  last_name: string;
+}

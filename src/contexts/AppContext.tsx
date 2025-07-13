@@ -1,20 +1,23 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { 
-  Student, 
-  Contact, 
-  Interaction, 
+import {
+  Student,
+  Contact,
+  Interaction,
   InteractionReason,
-  CounselorStats
+  CounselorStats,
+  Profile,
 } from '../types';
-import { 
-  students as initialStudents, 
-  contacts as initialContacts, 
+import {
+  profiles as initialProfiles,
+  students as initialStudents,
+  contacts as initialContacts,
   interactions as initialInteractions,
   interactionReasons as initialReasons,
-  counselorStats as initialStats
+  counselorStats as initialStats,
 } from '../services/mockData';
 
 interface AppContextType {
+  profiles: Profile[]; // Placeholder for profiles, can be replaced with actual type
   students: Student[];
   contacts: Contact[];
   interactions: Interaction[];
@@ -45,11 +48,34 @@ const generateId = (): string => {
 };
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [profiles, setProfiles] = useState<Profile[]>(initialProfiles);
+  // Profiles can be fetched from an API or a mock data source
+  // For now, we are using mock data
   const [students, setStudents] = useState<Student[]>(initialStudents);
   const [contacts, setContacts] = useState<Contact[]>(initialContacts);
   const [interactions, setInteractions] = useState<Interaction[]>(initialInteractions);
   const [interactionReasons, setInteractionReasons] = useState<InteractionReason[]>(initialReasons);
   const [stats, setStats] = useState<CounselorStats>(initialStats);
+
+  const addProfile = (profileData: Omit<Profile, 'id'>) => {
+    const newProfile = { ...profileData, id: generateId() };
+    setProfiles([...profiles, newProfile]);
+  };
+
+  const updateProfile = (updatedProfile: Profile) => {
+    setProfiles(
+      profiles.map((profile) => (profile.id === updatedProfile.id ? updatedProfile : profile))
+    );
+  };
+
+  const deleteProfile = (id: string) => {
+    setProfiles(profiles.filter((profile) => profile.id !== id));
+    // Option: Could also delete associated students, contacts, and interactions
+  };
+
+  const getProfileById = (id: string) => {
+    return profiles.find((profile) => profile.id === id);
+  };
 
   const addStudent = (studentData: Omit<Student, 'id'>) => {
     const newStudent = { ...studentData, id: generateId() };
@@ -57,21 +83,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const updateStudent = (updatedStudent: Student) => {
-    setStudents(students.map(student => 
-      student.id === updatedStudent.id ? updatedStudent : student
-    ));
-    
+    setStudents(
+      students.map((student) => (student.id === updatedStudent.id ? updatedStudent : student))
+    );
+
     // Update interaction person names if student name changed
     const studentFullName = `${updatedStudent.firstName} ${updatedStudent.lastName}`;
-    setInteractions(interactions.map(interaction => 
-      interaction.personId === updatedStudent.id
-        ? { ...interaction, personName: studentFullName }
-        : interaction
-    ));
+    setInteractions(
+      interactions.map((interaction) =>
+        interaction.personId === updatedStudent.id
+          ? { ...interaction, personName: studentFullName }
+          : interaction
+      )
+    );
   };
 
   const deleteStudent = (id: string) => {
-    setStudents(students.filter(student => student.id !== id));
+    setStudents(students.filter((student) => student.id !== id));
     // Option: Could also delete associated interactions
   };
 
@@ -81,41 +109,43 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const updateContact = (updatedContact: Contact) => {
-    setContacts(contacts.map(contact => 
-      contact.id === updatedContact.id ? updatedContact : contact
-    ));
-    
+    setContacts(
+      contacts.map((contact) => (contact.id === updatedContact.id ? updatedContact : contact))
+    );
+
     // Update interaction person names if contact name changed
     const contactFullName = `${updatedContact.firstName} ${updatedContact.lastName}`;
-    setInteractions(interactions.map(interaction => 
-      interaction.personId === updatedContact.id
-        ? { ...interaction, personName: contactFullName }
-        : interaction
-    ));
+    setInteractions(
+      interactions.map((interaction) =>
+        interaction.personId === updatedContact.id
+          ? { ...interaction, personName: contactFullName }
+          : interaction
+      )
+    );
   };
 
   const deleteContact = (id: string) => {
-    setContacts(contacts.filter(contact => contact.id !== id));
+    setContacts(contacts.filter((contact) => contact.id !== id));
     // Option: Could also delete associated interactions
   };
 
   const calculateInteractionDuration = (startTime: string, endTime: string): number => {
     const [startHours, startMinutes] = startTime.split(':').map(Number);
     const [endHours, endMinutes] = endTime.split(':').map(Number);
-    
+
     const startTotalMinutes = startHours * 60 + startMinutes;
     const endTotalMinutes = endHours * 60 + endMinutes;
-    
+
     return endTotalMinutes - startTotalMinutes;
   };
 
   const addInteraction = (interactionData: Omit<Interaction, 'id'>) => {
-    const newInteraction = { 
-      ...interactionData, 
+    const newInteraction = {
+      ...interactionData,
       id: generateId(),
-      duration: calculateInteractionDuration(interactionData.startTime, interactionData.endTime)
+      duration: calculateInteractionDuration(interactionData.startTime, interactionData.endTime),
     };
-    
+
     const updatedInteractions = [newInteraction, ...interactions];
     setInteractions(updatedInteractions);
     updateStatsFromInteractions(updatedInteractions);
@@ -124,25 +154,25 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const updateInteraction = (updatedInteraction: Interaction) => {
     // Ensure duration is correct based on times
     const duration = calculateInteractionDuration(
-      updatedInteraction.startTime, 
+      updatedInteraction.startTime,
       updatedInteraction.endTime
     );
-    
+
     const interactionWithDuration = {
       ...updatedInteraction,
-      duration
+      duration,
     };
-    
-    const updatedInteractions = interactions.map(interaction => 
+
+    const updatedInteractions = interactions.map((interaction) =>
       interaction.id === updatedInteraction.id ? interactionWithDuration : interaction
     );
-    
+
     setInteractions(updatedInteractions);
     updateStatsFromInteractions(updatedInteractions);
   };
 
   const deleteInteraction = (id: string) => {
-    const updatedInteractions = interactions.filter(interaction => interaction.id !== id);
+    const updatedInteractions = interactions.filter((interaction) => interaction.id !== id);
     setInteractions(updatedInteractions);
     updateStatsFromInteractions(updatedInteractions);
   };
@@ -153,32 +183,41 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const updateReason = (updatedReason: InteractionReason) => {
-    setInteractionReasons(interactionReasons.map(reason => 
-      reason.id === updatedReason.id ? updatedReason : reason
-    ));
+    setInteractionReasons(
+      interactionReasons.map((reason) => (reason.id === updatedReason.id ? updatedReason : reason))
+    );
   };
 
   const deleteReason = (id: string) => {
-    setInteractionReasons(interactionReasons.filter(reason => reason.id !== id));
+    setInteractionReasons(interactionReasons.filter((reason) => reason.id !== id));
   };
 
   const getReasonById = (id: string) => {
-    return interactionReasons.find(reason => reason.id === id);
+    return interactionReasons.find((reason) => reason.id === id);
   };
 
   const updateStatsFromInteractions = (currentInteractions: Interaction[]) => {
     const totalInteractions = currentInteractions.length;
-    const totalTimeSpent = currentInteractions.reduce((total, interaction) => total + interaction.duration, 0);
-    const studentInteractions = currentInteractions.filter(interaction => interaction.type === 'Student').length;
-    const contactInteractions = currentInteractions.filter(interaction => interaction.type === 'Contact').length;
-    const followUpsNeeded = currentInteractions.filter(interaction => interaction.followUpNeeded).length;
-    
+    const totalTimeSpent = currentInteractions.reduce(
+      (total, interaction) => total + interaction.duration,
+      0
+    );
+    const studentInteractions = currentInteractions.filter(
+      (interaction) => interaction.type === 'Student'
+    ).length;
+    const contactInteractions = currentInteractions.filter(
+      (interaction) => interaction.type === 'Contact'
+    ).length;
+    const followUpsNeeded = currentInteractions.filter(
+      (interaction) => interaction.followUpNeeded
+    ).length;
+
     setStats({
       totalInteractions,
       totalTimeSpent,
       studentInteractions,
       contactInteractions,
-      followUpsNeeded
+      followUpsNeeded,
     });
   };
 
@@ -187,11 +226,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const value = {
+    profiles, // Placeholder for profiles, can be replaced with actual data
     students,
     contacts,
     interactions,
     interactionReasons,
     stats,
+    addProfile,
+    updateProfile,
+    deleteProfile,
+    getProfileById,
     addStudent,
     updateStudent,
     deleteStudent,
@@ -206,7 +250,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     deleteReason,
     calculateInteractionDuration,
     getReasonById,
-    updateStats
+    updateStats,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

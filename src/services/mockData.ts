@@ -1,9 +1,25 @@
-import { Student, Contact, InteractionReason, Interaction, CounselorStats } from '../types';
+import { Student, Contact, InteractionReason, Interaction, CounselorStats, Profile } from '../types';
 
 // Generate random ID
 const generateId = (): string => {
   return Math.random().toString(36).substring(2, 9);
 };
+
+// Mock Profiles
+export const profiles : Profile[] = [
+  {
+    id: generateId(),
+    role: 'counselor',
+    first_name: 'Eleanor',
+    last_name: 'Jones'
+  },
+  {
+    id: generateId(),
+    role: 'admin',
+    first_name: 'Admin',
+    last_name: 'User'
+  }
+];
 
 // Mock Students
 export const students: Student[] = [
